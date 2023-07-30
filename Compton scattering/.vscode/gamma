@@ -1,0 +1,48 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.optimize import curve_fit
+# Simpson numerical integration 
+from scipy.integrate import simpson
+
+filename = input('Please enter the name of the file : \t' )
+
+# import data from txt
+data = np.genfromtxt(filename , delimiter=',', skip_header=1)
+col1 = int(input('Energy column = '))
+col2 = int(input('Count column = '))
+
+# extract x and y values from the data
+energy = data[:, col1]
+count = data[:, col2]
+
+
+X = np.argsort(energy)
+
+plt.plot(energy, count)
+plt.title('Count rate - Energy. Gamma-ray.' + filename)
+plt.ylabel('Counts') 
+plt.xlabel('Energy (KeV)')
+plt.grid()
+plt.show()
+
+plt.plot(X, count)     # plots counts as function of indexes - 
+plt.grid()          # so that the range over which is select data for gaussian can be chosen
+plt.ylabel('Counts') 
+plt.xlabel('Indexes')
+plt.show()
+
+initial_x = int(input('Please enter INITIAL x value you would like to integrate from: '))
+final_x = int(input('Please enter FINAL x value: '))
+
+R_A = simpson(count[initial_x: final_x], energy[initial_x: final_x], dx = 0.1, even='avg')
+d_R = ( energy[final_x] - energy[initial_x] ) * np.exp(-1)
+
+print('Area integrated under curve = %.3f' % R_A ,'$\pm$ = %.3f' % d_R)
+
+plt.plot(energy, count)
+plt.title('Count rate - Energy. Gamma-ray.' + filename)
+plt.ylabel('Counts') 
+plt.xlabel('Energy (KeV)')
+plt.fill_between(energy[initial_x: final_x], count[initial_x: final_x], color='red', alpha=.8,)
+plt.grid()
+plt.show()

@@ -1,0 +1,149 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.optimize import curve_fit
+
+filename = 'gamma dataV1.csv'
+#filename = input('Please enter the name of the file : ' )
+
+# import data from txt
+data = np.genfromtxt(filename , delimiter=',', skip_header=1)
+
+x_Al = data[:, 0]
+d_Al = data[:, 12]
+CsR_Al = data[:, 1]
+AmR_Al = data[:, 7]
+NaR_Al = data[:, 16]
+y_CsR_Al = np.log(CsR_Al)
+y_AmR_Al = np.log(AmR_Al)
+y_NaR_Al = np.log(NaR_Al)
+
+x_Fe = data[:, 2]
+d_Fe = data[:, 13]
+CsR_Fe = data[:, 3]
+AmR_Fe = data[:, 9]
+NaR_Fe = data[:, 18]
+y_CsR_Fe = np.log(CsR_Fe)
+y_AmR_Fe = np.log(AmR_Fe)
+y_NaR_Fe = np.log(NaR_Fe)
+
+x_Pb = data[:, 4]
+x_Pb_Na = data[:, 19]
+d_Pb_Na = d_Fe 
+d_Pb = data[:, 14]
+CsR_Pb = data[:, 5]
+AmR_Pb = data[:, 9]
+NaR_Pb = data[:, 20]
+y_CsR_Pb = np.log(CsR_Pb)
+y_AmR_Pb = np.log(AmR_Pb)
+y_NaR_Pb = np.log(NaR_Pb)
+
+
+def func(x, param):
+    y = np.zeros(len(x), dtype=float)
+    y = -x * param
+    return y
+
+
+grad_Cs_Al, cov_Cs_Al = curve_fit(func, x_Al, y_CsR_Al, maxfev=8000)
+fit_Cs_Al = func(x_Al, grad_Cs_Al)
+
+grad_Am_Al, cov_Am_Al = curve_fit(func, x_Al, y_AmR_Al, maxfev=8000)
+fit_Am_Al = func(x_Al, grad_Am_Al)
+
+grad_Cs_Fe, cov_Cs_Fe = curve_fit(func, x_Fe, y_CsR_Fe, maxfev=8000)
+fit_Cs_Fe = func(x_Fe, grad_Cs_Fe)
+
+grad_Am_Fe, cov_Am_Fe = curve_fit(func, x_Fe, y_AmR_Fe, maxfev=8000)
+fit_Am_Fe = func(x_Fe, grad_Am_Fe)
+
+grad_Cs_Pb, cov_Cs_Pb = curve_fit(func, x_Pb, y_CsR_Pb, maxfev=8000)
+fit_Cs_Pb = func(x_Pb, grad_Cs_Pb)
+
+grad_Am_Pb, cov_Am_Pb = curve_fit(func, x_Pb, y_AmR_Pb, maxfev=8000)
+fit_Am_Pb = func(x_Pb, grad_Am_Pb)
+
+grad_Na_Al, cov_Na_Al = curve_fit(func, x_Al, y_NaR_Al)
+fit_Na_Al = func(x_Al, grad_Na_Al)
+
+grad_Na_Fe, cov_Na_Fe = curve_fit(func, x_Fe, y_NaR_Fe)
+fit_Na_Fe = func(x_Fe, grad_Na_Fe)
+
+grad_Na_Pb, cov_Na_Pb = curve_fit(func, x_Pb_Na, y_NaR_Pb)
+fit_Na_Pb = func(x_Pb_Na, grad_Na_Pb)
+
+
+
+fig, axs = plt.subplots(3, 1, constrained_layout=True)
+
+axs[0].set_title('Cs137 Source. 662 KeV gamma rays.')
+
+axs[0].scatter(x_Al, y_CsR_Al, color='goldenrod', marker='^')
+axs[0].plot(x_Al, fit_Cs_Al, color='goldenrod', label='Aluminium - Cs137')
+axs[0].errorbar(x_Al, y_CsR_Al, color='r', xerr = d_Al, fmt='none', capsize=2)
+
+axs[0].scatter(x_Fe, y_CsR_Fe, color='steelblue', marker='D')
+axs[0].plot(x_Fe, fit_Cs_Fe, color='steelblue', label='Steel - Cs137')
+axs[0].errorbar(x_Fe, y_CsR_Fe, color='r', xerr = d_Fe, fmt='none', capsize=2)
+
+axs[0].scatter(x_Pb, y_CsR_Pb, color='magenta', marker='v')
+axs[0].plot(x_Pb, fit_Cs_Pb, color='magenta', label='Lead - Cs137')
+axs[0].errorbar(x_Pb, y_CsR_Pb, color='r', xerr = d_Pb, fmt='none', capsize=2, label='Error bar')
+
+axs[0].legend()
+axs[0].grid()
+
+
+axs[1].set_title('Am241 Source. 59.5 KeV gamma rays.')
+
+axs[1].scatter(x_Al, y_AmR_Al, color='goldenrod', marker='^')
+axs[1].plot(x_Al, fit_Am_Al, color='goldenrod', label='Aluminium - Am241')
+axs[1].errorbar(x_Al, y_AmR_Al, color='r', xerr = d_Al, ls='none', capsize=1.5)
+
+axs[1].scatter(x_Fe, y_AmR_Fe, color='steelblue', marker='D')
+axs[1].plot(x_Fe, fit_Am_Fe, color='steelblue', label='Steel - Am241')
+axs[1].errorbar(x_Fe, y_AmR_Fe, color='r', xerr = d_Fe, ls='none', capsize=1.5)
+
+axs[1].scatter(x_Pb, y_AmR_Pb, color='magenta', marker='v')
+axs[1].plot(x_Pb, fit_Am_Pb, color='magenta', label='Lead - Am241')
+axs[1].errorbar(x_Pb, y_AmR_Pb, color='r', xerr = d_Pb, ls='none', capsize=1.5, label='Error bar')
+
+axs[1].legend()
+axs[1].grid()
+
+
+axs[2].set_title('Na22 Source. 1275 Kev gamma rays.')
+
+axs[2].scatter(x_Al, y_NaR_Al, color='goldenrod', marker='^')
+axs[2].plot(x_Al, fit_Na_Al, color='goldenrod', label='Aluminium - Na22')
+axs[2].errorbar(x_Al, y_NaR_Al, color='r', xerr = d_Al, ls='none', capsize=1.5)
+
+axs[2].scatter(x_Fe, y_NaR_Fe, color='steelblue', marker='D')
+axs[2].plot(x_Fe, fit_Na_Fe, color='steelblue', label='Steel - Na22')
+axs[2].errorbar(x_Fe, y_NaR_Fe, color='r', xerr = d_Fe, ls='none', capsize=1.5)
+
+axs[2].scatter(x_Pb_Na, y_NaR_Pb, color='magenta', marker='v')
+axs[2].plot(x_Pb_Na, fit_Na_Pb, color='magenta', label='Lead - Na22')
+axs[2].errorbar(x_Pb_Na, y_NaR_Pb, color='r', xerr = d_Pb_Na, ls='none', capsize=1.5, label='Error bar')
+
+axs[2].legend()
+axs[2].grid()
+
+
+fig.suptitle('Log of ratio of gamma ray intensity against depth of material.')
+
+plt.ylabel('\t Log of ratio of count rates')
+plt.xlabel('Depth of attenuating material')
+plt.show()
+
+
+print('mu_Cs_Al = %.3f' % grad_Cs_Al)
+print('mu_Cs_Fe = %.3f' % grad_Cs_Fe)
+print('mu_Cs_Pb = %.3f' % grad_Cs_Pb)
+
+print('mu_Am_Al = %.3f' % grad_Am_Al)
+print('mu_Am_Fe = %.3f' % grad_Am_Fe)
+print('mu_Am_Pb = %.3f' % grad_Am_Pb)
+
+print('mu_Na_Al = %.3f' % grad_Na_Al)
+print('mu_Na_Fe = %.3f' % grad_Na_Fe)
+print('mu_Na_Pb = %.3f' % grad_Na_Pb)
